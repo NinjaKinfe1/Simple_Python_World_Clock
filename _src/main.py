@@ -1,7 +1,8 @@
 import tkinter as tk
+from tkinter import messagebox
 import requests
 import re
-import time
+
 
 root = tk.Tk()
 root.geometry("400x600")
@@ -11,23 +12,36 @@ root.title("Simple Python World Clock")
 
 #Functions
 def prevent_key(event):
-    pattern=r"[0123456789.\x08-]"
+    pattern=r"[0-9 \x08 \. \x16 -]"
     if not re.match(pattern, event.char):
         return "break"
 
 def submit():
-    latitude=la_entry.get()
-    longitude=lo_entry.get()
-    first_page.place_forget()
-    second_page.place(width=400, height=600)
-    url = f"https://timeapi.io/api/time/current/coordinate?latitude={latitude}&longitude={longitude}"
-    pull_request = requests.get(url)
-    get_data = pull_request.json()
-    print(get_data)
-    time_text.config(text=get_data["time"])
-    date_text_gui.config(text=get_data["date"])
-    day_of_the_week_text_gui.config(text=get_data["dayOfWeek"])
-    time_zone_text_gui.config(text=get_data["timeZone"])
+    latitude = la_entry.get()
+    longitude = lo_entry.get()
+    if latitude == "" or longitude == "":
+        messagebox.showwarning("Error","Please complete the necessary information!")
+        return
+
+    latitude = float(latitude)
+    longitude = float(longitude)
+
+    if not (-90 <= latitude <=90) or (-180<= longitude <=180):
+        messagebox.showwarning("Error", "Please enter a number within the specified range!")
+        la_entry.delete(0, tk.END)
+        lo_entry.delete(0, tk.END)
+        return
+
+    else:
+        first_page.place_forget()
+        second_page.place(width=400, height=600)
+        url = f"https://timeapi.io/api/time/current/coordinate?latitude={latitude}&longitude={longitude}"
+        pull_request = requests.get(url)
+        get_data = pull_request.json()
+        time_text.config(text=get_data["time"])
+        date_text_gui.config(text=get_data["date"])
+        day_of_the_week_text_gui.config(text=get_data["dayOfWeek"])
+        time_zone_text_gui.config(text=get_data["timeZone"])
 
 def back():
     first_page.place(width=400, height=600)
@@ -76,17 +90,17 @@ time_text.place(x=26, y=0)
 date_text=tk.Label(second_page, text="Date", font=("Open Sans Bold",25), bg="#f3f3f3", fg="#333333")
 date_text.place(x=158, y=217)
 date_text_gui=tk.Label(second_page, font=("Open Sans Regular",15), bg="#f3f3f3", fg="#333333")
-date_text_gui.place(x=144, y=267)
+date_text_gui.place(relx=0.5, anchor="center", y=287)
 
 day_of_the_week_text=tk.Label(second_page, text="Day of The Week", font=("Open Sans Bold",25), bg="#f3f3f3", fg="#333333")
 day_of_the_week_text.place(x=61, y=302)
 day_of_the_week_text_gui=tk.Label(second_page, font=("Open Sans Regular",15), bg="#f3f3f3", fg="#333333")
-day_of_the_week_text_gui.place(x=170, y=352)
+day_of_the_week_text_gui.place(relx=0.5, anchor="center", y=372)
 
 time_zone_text=tk.Label(second_page, text="Time Zone", font=("Open Sans Bold",25), bg="#f3f3f3", fg="#333333")
 time_zone_text.place(x=112, y=387)
 time_zone_text_gui=tk.Label(second_page, font=("Open Sans Regular",15), bg="#f3f3f3", fg="#333333")
-time_zone_text_gui.place(x=111, y=437)
+time_zone_text_gui.place(relx=0.5, anchor="center",y=457)
 
 back_button=tk.Button(second_page, text="Back", font=("Open Sans ExtraBold",25), bg="#333333", fg="#ffffff", activebackground="#f3f3f3", activeforeground="#333333", bd=0, highlightthickness=0, command=back)
 back_button.place(x=100,y=522, width=200, height=50)
