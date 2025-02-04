@@ -17,31 +17,35 @@ def prevent_key(event):
         return "break"
 
 def submit():
-    latitude = la_entry.get()
-    longitude = lo_entry.get()
-    if latitude == "" or longitude == "":
-        messagebox.showwarning("Error","Please complete the necessary information!")
-        return
+    try:
+        latitude = la_entry.get()
+        longitude = lo_entry.get()
+        if latitude == "" or longitude == "":
+            messagebox.showwarning("Error","Please complete the necessary information!")
+            return
 
-    latitude = float(latitude)
-    longitude = float(longitude)
+        latitude = float(latitude)
+        longitude = float(longitude)
 
-    if not (-90 <= latitude <=90) or (-180<= longitude <=180):
-        messagebox.showwarning("Error", "Please enter a number within the specified range!")
-        la_entry.delete(0, tk.END)
-        lo_entry.delete(0, tk.END)
-        return
+        if not (-90 <= latitude <=90) or not(-180 <= longitude <=180):
+            messagebox.showwarning("Error", "Please enter a number within the specified range!")
+            la_entry.delete(0, tk.END)
+            lo_entry.delete(0, tk.END)
+            return
 
-    else:
-        first_page.place_forget()
-        second_page.place(width=400, height=600)
-        url = f"https://timeapi.io/api/time/current/coordinate?latitude={latitude}&longitude={longitude}"
-        pull_request = requests.get(url)
-        get_data = pull_request.json()
-        time_text.config(text=get_data["time"])
-        date_text_gui.config(text=get_data["date"])
-        day_of_the_week_text_gui.config(text=get_data["dayOfWeek"])
-        time_zone_text_gui.config(text=get_data["timeZone"])
+        else:
+            first_page.place_forget()
+            second_page.place(width=400, height=600)
+            url = f"https://timeapi.io/api/time/current/coordinate?latitude={latitude}&longitude={longitude}"
+            pull_request = requests.get(url)
+            get_data = pull_request.json()
+            time_text.config(text=get_data["time"])
+            date_text_gui.config(text=get_data["date"])
+            day_of_the_week_text_gui.config(text=get_data["dayOfWeek"])
+            time_zone_text_gui.config(text=get_data["timeZone"])
+            second_page.after(60000, back)
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
 def back():
     first_page.place(width=400, height=600)
@@ -85,7 +89,7 @@ second_page=tk.Frame(root, bg="#f3f3f3")
 time_frame=tk.Frame(second_page, bg="#ffffff")
 time_frame.place(width=320, height=150, x=40, y=40)
 time_text=tk.Label(time_frame, font=("Alfa Slab One",70), bg="#ffffff", fg="#333333")
-time_text.place(x=26, y=0)
+time_text.place(relx=0.5, anchor="center", y=70)
 
 date_text=tk.Label(second_page, text="Date", font=("Open Sans Bold",25), bg="#f3f3f3", fg="#333333")
 date_text.place(x=158, y=217)
